@@ -12,6 +12,13 @@ Open the app: https://uberfemsch.github.io/my-plant-collection/
 
 Photograph your plants, label them in your own words, and they file into your own collection (saved on your device). Every labeled photo is training data for the Rare Leaf ID model.
 
-**Want to help the model learn?** Especially wanted: Monstera 'Thai Constellation' — no two have the same variegation pattern, and the model needs many different plants to learn the range. In the app, tap "Export labels as JSON", then open an Issue in this repo and attach your exported file (or attach your labeled photos directly with their names).
+**What we're collecting — rare is the theme:**
+- Every Monstera deliciosa cultivar: Thai Constellation, Albo, Aurea, Legacy — whatever form, whatever pattern. No two variegated plants look alike, and the model needs many different plants to learn the range of each one.
+- Rare Alocasias — especially variegated ones.
+- Any rare or variegated leaf you grow.
+
+**How to contribute:** in the app, tap "Export labels as JSON", then open an Issue in this repo and attach your exported file (or attach your labeled photos directly, with their names).
+
+**Label carefully** — use the full name you're confident in. Every submission is reviewed and corrected by Nichole before it goes anywhere near training: wrong labels teach the model wrong lessons, so accuracy matters more than volume.
 
 © 2026 Anchorpoint Ventures LLC
