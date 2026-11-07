@@ -1,0 +1,1013 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <!-- Installable web-app touches: when this file is hosted (e.g. GitHub
+         Pages) and added to an Android home screen, it opens full-screen
+         like a native app, tinted to match the deep-green greenhouse theme. -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f5ec" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#131a12" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="My Plants" />
+    <meta name="application-name" content="My Plant Collection" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='10' fill='%23131a12'/%3E%3Cpath d='M40 8C24 10 12 18 9.5 31 8.2 38 12 42 17 41.6 30 40.6 38.5 26 40 8Z' fill='%237fb069'/%3E%3Cpath d='M12 38C18 28 27 19 37 12' stroke='%23131a12' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%23131a12'/%3E%3Cpath d='M40 8C24 10 12 18 9.5 31 8.2 38 12 42 17 41.6 30 40.6 38.5 26 40 8Z' fill='%237fb069'/%3E%3Cpath d='M12 38C18 28 27 19 37 12' stroke='%23131a12' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <title>My Plant Collection — Portable</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f7f5ec;
+        --surface: #fffdf6;
+        --surface-2: #eef0e0;
+        --text: #22301f;
+        --dim: #5c6a58;
+        --border: #d8dcc8;
+        --accent: #1e4d2e;
+        --accent-text: #ffffff;
+        --clay: #c05f2e;
+        --clay-text: #ffffff;
+        --danger: #a83226;
+        --radius: 14px;
+        --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+        --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #131a12;
+          --surface: #1d261c;
+          --surface-2: #28331f;
+          --text: #eef2e4;
+          --dim: #a7b39c;
+          --border: #39462f;
+          --accent: #7fb069;
+          --accent-text: #12240f;
+          --clay: #d97b45;
+          --clay-text: #241105;
+          --danger: #e08a7d;
+        }
+      }
+      * { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: var(--font-body);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 16px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+      .display { font-family: var(--font-display); }
+      button { font-family: inherit; cursor: pointer; }
+      button:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      input, textarea { font-family: inherit; }
+      .sr-only {
+        position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+        overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+      }
+
+      .wrap { margin: 0 auto; width: 100%; max-width: 768px; padding: env(safe-area-inset-top, 0px) 16px 128px; }
+      .wrap-narrow { margin: 0 auto; width: 100%; max-width: 576px; padding: env(safe-area-inset-top, 0px) 16px 40px; }
+
+      /* ---------- masthead ---------- */
+      .masthead { padding: 24px 0 8px; }
+      .masthead-row { display: flex; align-items: flex-start; gap: 12px; }
+      .masthead h1 { margin: 0; font-size: 30px; line-height: 1.05; font-weight: 600; }
+      .masthead .sub { margin: 6px 0 0; font-size: 14px; line-height: 1.45; color: var(--dim); }
+      .portable-tag {
+        display: inline-block; margin-top: 8px; padding: 2px 10px;
+        border: 1px solid var(--border); border-radius: 999px;
+        background: var(--surface); color: var(--dim);
+        font-size: 12px; font-weight: 600; letter-spacing: 0.01em;
+      }
+
+      /* ---------- search ---------- */
+      .search-row { padding: 12px 0; }
+      .search-input {
+        width: 100%; border-radius: 999px; border: 1px solid var(--border);
+        background: var(--surface); padding: 12px 16px; font-size: 16px; color: var(--text);
+      }
+      .search-input::placeholder { color: var(--dim); }
+
+      /* ---------- cards ---------- */
+      .card {
+        display: block; width: 100%; text-align: left; padding: 0;
+        overflow: hidden; border-radius: var(--radius);
+        border: 1px solid var(--border); background: var(--surface);
+        color: var(--text);
+      }
+      .card img { display: block; width: 100%; object-fit: cover; aspect-ratio: 4 / 3; background: var(--surface-2); }
+      .card.featured img { aspect-ratio: 16 / 10; }
+      .card .no-photo {
+        display: flex; width: 100%; align-items: center; justify-content: center;
+        background: var(--surface-2); aspect-ratio: 4 / 3;
+      }
+      .card.featured .no-photo { aspect-ratio: 16 / 10; }
+      .card-body { padding: 12px; }
+      .card.featured .card-body { padding: 16px; }
+      .card-name { margin: 0; font-weight: 600; line-height: 1.3; font-size: 16px; overflow-wrap: anywhere; }
+      .card.featured .card-name { font-size: 24px; }
+      .card-nick { margin: 2px 0 0; font-size: 14px; font-style: italic; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .card-date { margin: 4px 0 0; font-size: 12px; color: var(--dim); }
+      .grid { margin-top: 16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      @media (min-width: 640px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+      /* ---------- buttons ---------- */
+      .btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        border-radius: 999px; padding: 10px 20px; font-size: 14px; font-weight: 600;
+        border: 1px solid var(--border); background: var(--surface); color: var(--text);
+        min-height: 44px;
+      }
+      .btn:disabled { opacity: 0.5; cursor: default; }
+      .btn-clay { background: var(--clay); color: var(--clay-text); border-color: transparent; font-weight: 700; font-size: 16px; padding: 14px 24px; }
+      .btn-accent { background: var(--accent); color: var(--accent-text); border-color: transparent; }
+      .btn-danger { background: var(--danger); color: #fff; border-color: transparent; }
+      .btn-ghost-dark { background: rgba(0,0,0,0.6); color: #fff; border-color: transparent; }
+      .btn-white { background: #fff; color: #000; border-color: transparent; }
+      .link-danger { background: none; border: 0; padding: 4px 0; font-size: 14px; font-weight: 500; color: var(--danger); min-height: 44px; }
+
+      .fab {
+        position: fixed; right: 20px; z-index: 20;
+        bottom: max(24px, env(safe-area-inset-bottom));
+        display: flex; align-items: center; gap: 8px;
+        border-radius: 999px; border: 0;
+        background: var(--clay); color: var(--clay-text);
+        padding: 14px 20px; font-size: 16px; font-weight: 700;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.25); min-height: 52px;
+      }
+
+      /* ---------- empty / status ---------- */
+      .empty { padding: 56px 0; text-align: center; }
+      .empty h2 { margin: 20px 0 0; font-size: 30px; font-weight: 600; }
+      .empty p { margin: 12px auto 0; max-width: 380px; font-size: 16px; line-height: 1.6; color: var(--dim); }
+      .empty .actions { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+      .no-results { padding: 48px 0; text-align: center; font-size: 16px; color: var(--dim); overflow-wrap: anywhere; }
+      .banner {
+        margin: 12px 0; padding: 12px 16px; border-radius: var(--radius);
+        border: 1px solid var(--border); background: var(--surface);
+        font-size: 14px; line-height: 1.5;
+      }
+      .banner.error { border-color: var(--danger); color: var(--danger); }
+      .banner[hidden] { display: none; }
+
+      /* ---------- data section ---------- */
+      .data-section { margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px; }
+      .data-section h3 { margin: 0 0 4px; font-size: 18px; font-weight: 600; }
+      .data-section p { margin: 6px 0 0; font-size: 14px; line-height: 1.55; color: var(--dim); }
+      .data-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+      .data-status { font-size: 14px; color: var(--dim); }
+      .import-confirm {
+        margin-top: 14px; padding: 14px 16px; border-radius: var(--radius);
+        border: 1px solid var(--accent); background: var(--surface);
+      }
+      .import-confirm p { margin: 0; color: var(--text); font-size: 14px; line-height: 1.55; }
+      .import-confirm .row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+      .import-confirm[hidden] { display: none; }
+
+      /* ---------- overlays (detail + form) ---------- */
+      .overlay { position: fixed; inset: 0; z-index: 30; overflow-y: auto; background: var(--bg); }
+      .overlay.top { z-index: 40; }
+      .overlay[hidden] { display: none; }
+      .overlay-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 0; }
+      .overlay-bar h2 { margin: 0; font-size: 24px; font-weight: 600; }
+      .detail-photo { display: block; width: 100%; border-radius: var(--radius); border: 1px solid var(--border); object-fit: cover; background: var(--surface-2); }
+      .detail-no-photo { display: flex; aspect-ratio: 4 / 3; width: 100%; align-items: center; justify-content: center; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface-2); }
+      .detail-name { margin: 20px 0 0; font-size: 30px; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+      .detail-nick { margin: 4px 0 0; font-size: 18px; font-style: italic; color: var(--dim); overflow-wrap: anywhere; }
+      .detail-meta { margin: 20px 0 0; border-top: 1px solid var(--border); padding-top: 16px; }
+      .detail-meta .row { display: flex; gap: 12px; margin-bottom: 10px; font-size: 16px; }
+      .detail-meta dt { width: 112px; flex-shrink: 0; font-weight: 600; color: var(--dim); }
+      .detail-meta dd { margin: 0; }
+      .detail-notes { margin: 16px 0 0; font-size: 16px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+      .detail-danger { margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px; }
+      .delete-confirm { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+      .delete-confirm p { margin: 0; font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
+      .field-error { margin: 8px 0 0; font-size: 14px; color: var(--danger); }
+
+      /* ---------- form ---------- */
+      .photo-picker {
+        display: flex; aspect-ratio: 4 / 3; width: 100%; flex-direction: column;
+        align-items: center; justify-content: center; gap: 8px;
+        border-radius: var(--radius); border: 2px dashed var(--border);
+        background: var(--surface); color: var(--accent); padding: 16px;
+      }
+      .photo-picker .big { font-size: 16px; font-weight: 600; color: var(--text); }
+      .photo-picker .small { padding: 0 24px; text-align: center; font-size: 14px; color: var(--dim); }
+      .photo-preview { position: relative; overflow: hidden; border-radius: var(--radius); border: 1px solid var(--border); }
+      .photo-preview img { display: block; aspect-ratio: 4 / 3; width: 100%; object-fit: cover; }
+      .photo-preview .bar { position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-wrap: wrap; gap: 8px; background: rgba(0,0,0,0.45); padding: 12px; }
+      /* The file input itself fills its label, so a tap lands directly on
+         the input — no JavaScript click-forwarding, which Android webviews
+         can silently drop after the first use. */
+      .file-control { position: relative; overflow: hidden; }
+      .file-control input[type="file"] {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        opacity: 0; cursor: pointer; font-size: 0; margin: 0; padding: 0;
+      }
+      .file-control input[type="file"]:disabled { cursor: default; }
+      .photo-choices { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 10px; }
+      .photo-choices .btn { justify-content: center; }
+      label.btn { cursor: pointer; }
+      .fields { margin-top: 24px; }
+      .field { margin-bottom: 20px; }
+      .field label { display: block; font-size: 14px; font-weight: 600; }
+      .field label .req { color: var(--clay); }
+      .field label .opt { font-weight: 400; color: var(--dim); }
+      .field input, .field textarea {
+        margin-top: 6px; width: 100%; border-radius: var(--radius);
+        border: 1px solid var(--border); background: var(--surface);
+        padding: 12px 14px; font-size: 16px; color: var(--text);
+      }
+      .field input::placeholder, .field textarea::placeholder { color: var(--dim); }
+      .field .hint { margin: 4px 0 0; font-size: 14px; color: var(--dim); }
+      .save-btn { margin-top: 8px; width: 100%; justify-content: center; }
+      .save-btn:disabled { opacity: 0.4; }
+
+      @media (prefers-reduced-motion: reduce) {
+        * { transition: none !important; animation: none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <header class="masthead">
+        <div class="masthead-row">
+          <span id="leaf-masthead" aria-hidden="true"></span>
+          <div>
+            <h1 class="display">My Plant Collection</h1>
+            <p class="sub" id="counts">Opening the greenhouse…</p>
+            <span class="portable-tag">Portable edition — lives in this file, on your device</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="banner" id="banner" role="status" hidden></div>
+
+      <!-- Empty state -->
+      <section class="empty" id="empty-state" hidden>
+        <div id="leaf-empty" aria-hidden="true"></div>
+        <h2 class="display">Your shelf is empty.</h2>
+        <p>Take a picture of a plant, tell it what it is, and it lives here — labeled by you, exactly the way you know it. Everything is stored in this browser, on this device.</p>
+        <div class="actions">
+          <button type="button" class="btn btn-clay" id="empty-add"></button>
+          <label class="btn">Import a backup<input class="sr-only import-file-input" type="file" accept="application/json,.json" aria-label="Import a backup" /></label>
+        </div>
+      </section>
+
+      <!-- Collection -->
+      <section id="collection" hidden>
+        <div class="search-row">
+          <label class="sr-only" for="search">Search your collection</label>
+          <input class="search-input" id="search" type="search" placeholder="Search by name, nickname, or note…" autocomplete="off" />
+        </div>
+        <div id="cards"></div>
+        <p class="no-results" id="no-results" hidden></p>
+      </section>
+
+      <!-- Data: export / import / your copy -->
+      <section class="data-section" id="data-section">
+        <h3 class="display">Your labels, your file</h3>
+        <p>Export saves your whole collection — labels, notes, dates, and photos — as one JSON file. Import restores it in any browser, on any device. That file is also the labeled list that can grow into a training dataset.</p>
+        <div class="data-actions">
+          <button type="button" class="btn" id="export-btn">Export labels as JSON</button>
+          <label class="btn">Import<input class="sr-only import-file-input" type="file" accept="application/json,.json" aria-label="Import collection JSON" /></label>
+          <button type="button" class="btn" id="download-app-btn">Save a copy of this app</button>
+        </div>
+        <p class="data-status" id="data-status"></p>
+        <div class="import-confirm" id="import-confirm" hidden>
+          <p id="import-confirm-text"></p>
+          <div class="row">
+            <button type="button" class="btn btn-accent" id="import-add">Add to my collection</button>
+            <button type="button" class="btn btn-danger" id="import-replace">Replace my collection</button>
+            <button type="button" class="btn" id="import-cancel">Cancel</button>
+          </div>
+        </div>
+        <p>Plants and photos are stored only in this browser's storage on this device — clearing browser data clears them, so keep an export somewhere safe (your files, your email, a GitHub repo). This single HTML file is the whole app: host it on GitHub Pages or just open it from your files, and it works the same.</p>
+      </section>
+    </main>
+
+    <button type="button" class="fab" id="fab" hidden></button>
+
+    <!-- Detail view -->
+    <div class="overlay" id="detail" hidden>
+      <div class="wrap-narrow">
+        <div class="overlay-bar">
+          <button type="button" class="btn" id="detail-back">← Collection</button>
+          <button type="button" class="btn btn-accent" id="detail-edit">Edit</button>
+        </div>
+        <div id="detail-body"></div>
+        <div class="detail-danger">
+          <div class="delete-confirm" id="delete-confirm" hidden>
+            <p id="delete-confirm-text"></p>
+            <button type="button" class="btn btn-danger" id="delete-yes">Yes, remove it</button>
+            <button type="button" class="btn" id="delete-no">Keep it</button>
+          </div>
+          <button type="button" class="link-danger" id="delete-start">Remove from collection</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add / edit form -->
+    <div class="overlay top" id="form" hidden>
+      <div class="wrap-narrow">
+        <div class="overlay-bar">
+          <h2 class="display" id="form-title">Add a plant</h2>
+          <button type="button" class="btn" id="form-cancel">Cancel</button>
+        </div>
+
+        <div class="photo-preview" id="photo-preview" hidden>
+          <img id="photo-preview-img" alt="Your plant" />
+          <div class="bar">
+            <label class="btn btn-white file-control">Use camera<input class="photo-file-input" type="file" accept="image/*" capture="environment" aria-label="Take a new photo with the camera" /></label>
+            <label class="btn btn-white file-control">Use gallery<input class="photo-file-input" type="file" accept="image/*" aria-label="Choose a different photo from your gallery" /></label>
+            <button type="button" class="btn btn-ghost-dark" id="photo-remove">Remove photo</button>
+          </div>
+        </div>
+        <div class="photo-picker" id="photo-picker">
+          <span id="camera-icon" aria-hidden="true"></span>
+          <span class="big" id="photo-picker-label">Add a photo</span>
+          <span class="small">Snap the leaf, the whole plant — whatever shows it best.</span>
+          <div class="photo-choices">
+            <label class="btn btn-accent file-control">Take a photo<input class="photo-file-input" type="file" accept="image/*" capture="environment" aria-label="Take a photo of your plant" /></label>
+            <label class="btn file-control">Choose from gallery<input class="photo-file-input" type="file" accept="image/*" aria-label="Choose a plant photo from your gallery" /></label>
+          </div>
+        </div>
+        <p class="field-error" id="photo-error" hidden></p>
+
+        <div class="fields">
+          <div class="field">
+            <label for="f-name">What is it? <span class="req">*</span></label>
+            <input id="f-name" type="text" placeholder="Alocasia chantrieri ‘Pink’" autocomplete="off" maxlength="200" />
+            <p class="hint">Your label, exactly as you know it — species, cultivar, form.</p>
+          </div>
+          <div class="field">
+            <label for="f-nickname">Nickname <span class="opt">(optional)</span></label>
+            <input id="f-nickname" type="text" placeholder="the pink chant" autocomplete="off" maxlength="200" />
+          </div>
+          <div class="field">
+            <label for="f-acquired">When did you get it? <span class="opt">(optional)</span></label>
+            <input id="f-acquired" type="date" aria-label="When did you get it" />
+          </div>
+          <div class="field">
+            <label for="f-notes">Notes <span class="opt">(optional)</span></label>
+            <textarea id="f-notes" rows="3" placeholder="Where it came from, new leaf watch, quirks…" maxlength="2000"></textarea>
+          </div>
+        </div>
+
+        <p class="field-error" id="save-error" hidden></p>
+        <button type="button" class="btn btn-clay save-btn" id="form-save">Add to my collection</button>
+      </div>
+    </div>
+
+    <script>
+      "use strict";
+
+      /* ============================================================
+         My Plant Collection — Portable
+         One self-contained file. No server, no account.
+         Plants + photos live in this browser's localStorage.
+         Export / import moves them anywhere as a single JSON file.
+         ============================================================ */
+
+      var STORAGE_KEY = "my-plant-collection-portable:v1";
+      var PHOTO_MAX_EDGE = 1100;   /* downscale before storing so many plants fit */
+      var PHOTO_QUALITY = 0.72;
+
+      /* ---------- tiny DOM helpers ---------- */
+      function $(id) { return document.getElementById(id); }
+      function el(tag, cls, text) {
+        var n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text != null) n.textContent = text;
+        return n;
+      }
+      function newId() {
+        return "p-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9);
+      }
+      function leafSVG(size) {
+        return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 48 48" fill="none" aria-hidden="true">' +
+          '<path d="M40 8C24 10 12 18 9.5 31 8.2 38 12 42 17 41.6 30 40.6 38.5 26 40 8Z" fill="var(--accent)" opacity="0.9"/>' +
+          '<path d="M12 38C18 28 27 19 37 12" stroke="var(--bg)" stroke-width="2.2" stroke-linecap="round"/></svg>';
+      }
+      var PLUS_SVG = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+      var CAMERA_SVG = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 8h3l2-2.5h6L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.4" stroke="currentColor" stroke-width="1.8"/></svg>';
+
+      $("leaf-masthead").innerHTML = leafSVG(40);
+      $("leaf-empty").innerHTML = leafSVG(84);
+      $("camera-icon").innerHTML = CAMERA_SVG;
+      $("fab").innerHTML = PLUS_SVG + "<span>Add a plant</span>";
+      $("empty-add").innerHTML = PLUS_SVG + "<span>Add your first plant</span>";
+
+      /* ---------- dates ---------- */
+      function formatAdded(iso) {
+        var d = new Date(iso);
+        if (isNaN(d.getTime())) return "";
+        return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+      }
+      function formatAcquired(ymd) {
+        var d = new Date(ymd + "T00:00:00");
+        if (isNaN(d.getTime())) return ymd;
+        return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+      }
+      function validYmd(s) { return typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s); }
+
+      /* ---------- storage ---------- */
+      var plants = [];
+      var storageBroken = false;
+
+      function loadPlants() {
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return [];
+          var parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed)) return [];
+          return parsed.filter(function (p) {
+            return p && typeof p.name === "string" && p.name.trim();
+          }).map(function (p) {
+            return {
+              id: typeof p.id === "string" && p.id ? p.id : newId(),
+              name: p.name,
+              nickname: p.nickname || null,
+              notes: p.notes || null,
+              acquired_date: validYmd(p.acquired_date) ? p.acquired_date : null,
+              photo: typeof p.photo === "string" && p.photo.indexOf("data:image/") === 0 ? p.photo : null,
+              created_at: typeof p.created_at === "string" ? p.created_at : new Date().toISOString(),
+              updated_at: typeof p.updated_at === "string" ? p.updated_at : new Date().toISOString()
+            };
+          });
+        } catch (e) {
+          storageBroken = true;
+          return [];
+        }
+      }
+
+      /* Returns true on success. On quota failure, returns false and the
+         caller rolls back so what's on screen always matches what's saved. */
+      function savePlants(next) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+          plants = next;
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      function storageUsageText() {
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY) || "";
+          if (!raw) return "";
+          var kb = Math.round((raw.length * 2) / 1024);
+          var size = kb >= 1024 ? (kb / 1024).toFixed(1) + " MB" : Math.max(1, kb) + " KB";
+          return "Stored on this device: " + size + ".";
+        } catch (e) { return ""; }
+      }
+
+      /* ---------- banner ---------- */
+      var bannerTimer = null;
+      function showBanner(msg, isError, sticky) {
+        var b = $("banner");
+        b.textContent = msg;
+        b.className = "banner" + (isError ? " error" : "");
+        b.hidden = false;
+        if (bannerTimer) clearTimeout(bannerTimer);
+        if (!sticky) {
+          bannerTimer = setTimeout(function () { b.hidden = true; }, 6000);
+        }
+      }
+
+      /* ---------- photo processing ---------- */
+      function processImage(file) {
+        return new Promise(function (resolve, reject) {
+          var url = URL.createObjectURL(file);
+          var img = new Image();
+          img.onload = function () {
+            try {
+              var scale = Math.min(1, PHOTO_MAX_EDGE / Math.max(img.naturalWidth, img.naturalHeight));
+              var w = Math.max(1, Math.round(img.naturalWidth * scale));
+              var h = Math.max(1, Math.round(img.naturalHeight * scale));
+              var canvas = document.createElement("canvas");
+              canvas.width = w; canvas.height = h;
+              var ctx = canvas.getContext("2d");
+              if (!ctx) throw new Error("canvas");
+              ctx.drawImage(img, 0, 0, w, h);
+              URL.revokeObjectURL(url);
+              resolve(canvas.toDataURL("image/jpeg", PHOTO_QUALITY));
+            } catch (err) {
+              URL.revokeObjectURL(url);
+              reject(err);
+            }
+          };
+          img.onerror = function () {
+            URL.revokeObjectURL(url);
+            reject(new Error("unreadable"));
+          };
+          img.src = url;
+        });
+      }
+
+      /* ---------- rendering: collection ---------- */
+      var searchText = "";
+
+      function filteredPlants() {
+        var q = searchText.trim().toLowerCase();
+        if (!q) return plants;
+        return plants.filter(function (p) {
+          return [p.name, p.nickname || "", p.notes || ""].join(" ").toLowerCase().indexOf(q) !== -1;
+        });
+      }
+
+      function makeCard(plant, featured) {
+        var card = el("button", "card" + (featured ? " featured" : ""));
+        card.type = "button";
+        card.setAttribute("aria-label", "View " + plant.name);
+        if (plant.photo) {
+          var img = el("img");
+          img.src = plant.photo;
+          img.alt = plant.name;
+          img.loading = "lazy";
+          card.appendChild(img);
+        } else {
+          var ph = el("div", "no-photo");
+          ph.innerHTML = leafSVG(featured ? 64 : 40);
+          card.appendChild(ph);
+        }
+        var body = el("div", "card-body");
+        body.appendChild(el("p", "card-name display", plant.name));
+        if (plant.nickname) body.appendChild(el("p", "card-nick", "“" + plant.nickname + "”"));
+        body.appendChild(el("p", "card-date", "Added " + formatAdded(plant.created_at)));
+        card.appendChild(body);
+        card.addEventListener("click", function () { openDetail(plant.id); });
+        return card;
+      }
+
+      function render() {
+        var counts = $("counts");
+        if (plants.length === 0) {
+          counts.textContent = "Every collection starts with one plant.";
+        } else {
+          var labels = {};
+          plants.forEach(function (p) { labels[p.name.trim().toLowerCase()] = true; });
+          var labelCount = Object.keys(labels).length;
+          counts.textContent =
+            plants.length + (plants.length === 1 ? " plant" : " plants") + " · " +
+            labelCount + (labelCount === 1 ? " label" : " labels") + " in your own words";
+        }
+
+        $("empty-state").hidden = plants.length !== 0;
+        $("collection").hidden = plants.length === 0;
+        $("fab").hidden = plants.length === 0;
+        $("data-status").textContent = storageUsageText();
+
+        if (plants.length === 0) return;
+
+        var list = filteredPlants();
+        var holder = $("cards");
+        holder.textContent = "";
+        var noRes = $("no-results");
+        if (list.length === 0) {
+          noRes.textContent = "Nothing matches “" + searchText + "” yet.";
+          noRes.hidden = false;
+          return;
+        }
+        noRes.hidden = true;
+        holder.appendChild(makeCard(list[0], true));
+        if (list.length > 1) {
+          var grid = el("div", "grid");
+          for (var i = 1; i < list.length; i++) grid.appendChild(makeCard(list[i], false));
+          holder.appendChild(grid);
+        }
+      }
+
+      /* ---------- detail view ---------- */
+      var selectedId = null;
+
+      function selectedPlant() {
+        for (var i = 0; i < plants.length; i++) if (plants[i].id === selectedId) return plants[i];
+        return null;
+      }
+
+      function openDetail(id) {
+        selectedId = id;
+        var p = selectedPlant();
+        if (!p) return;
+        var body = $("detail-body");
+        body.textContent = "";
+
+        if (p.photo) {
+          var img = el("img", "detail-photo");
+          img.src = p.photo;
+          img.alt = p.name;
+          body.appendChild(img);
+        } else {
+          var ph = el("div", "detail-no-photo");
+          ph.innerHTML = leafSVG(72);
+          body.appendChild(ph);
+        }
+        body.appendChild(el("h2", "detail-name display", p.name));
+        if (p.nickname) body.appendChild(el("p", "detail-nick display", "“" + p.nickname + "”"));
+
+        var dl = el("dl", "detail-meta");
+        var row1 = el("div", "row");
+        row1.appendChild(el("dt", null, "Added"));
+        row1.appendChild(el("dd", null, formatAdded(p.created_at)));
+        dl.appendChild(row1);
+        if (p.acquired_date) {
+          var row2 = el("div", "row");
+          row2.appendChild(el("dt", null, "Got it"));
+          row2.appendChild(el("dd", null, formatAcquired(p.acquired_date)));
+          dl.appendChild(row2);
+        }
+        body.appendChild(dl);
+
+        if (p.notes) body.appendChild(el("p", "detail-notes", p.notes));
+
+        $("delete-confirm").hidden = true;
+        $("delete-start").hidden = false;
+        $("detail").hidden = false;
+        $("detail").scrollTop = 0;
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeDetail() {
+        selectedId = null;
+        $("detail").hidden = true;
+        if ($("form").hidden) document.body.style.overflow = "";
+      }
+
+      $("detail-back").addEventListener("click", closeDetail);
+      $("detail-edit").addEventListener("click", function () {
+        var p = selectedPlant();
+        if (p) openForm(p);
+      });
+      $("delete-start").addEventListener("click", function () {
+        var p = selectedPlant();
+        if (!p) return;
+        $("delete-confirm-text").textContent = "Remove " + p.name + " from the collection?";
+        $("delete-confirm").hidden = false;
+        $("delete-start").hidden = true;
+      });
+      $("delete-no").addEventListener("click", function () {
+        $("delete-confirm").hidden = true;
+        $("delete-start").hidden = false;
+      });
+      $("delete-yes").addEventListener("click", function () {
+        var p = selectedPlant();
+        if (!p) return;
+        var next = plants.filter(function (x) { return x.id !== p.id; });
+        if (!savePlants(next)) {
+          showBanner("Couldn't save that change — this browser's storage may be unavailable.", true);
+          return;
+        }
+        closeDetail();
+        render();
+        showBanner("Removed " + p.name + ".");
+      });
+
+      /* ---------- add / edit form ---------- */
+      var editingId = null;      /* null = adding */
+      var formPhoto = null;      /* data URL, or null */
+      var formPhotoState = "none"; /* none | set | removed */
+
+      function refreshPhotoUI(busy) {
+        var has = formPhotoState === "set" && !!formPhoto;
+        $("photo-preview").hidden = !has;
+        $("photo-picker").hidden = has;
+        if (has) $("photo-preview-img").src = formPhoto;
+        $("photo-picker-label").textContent = busy ? "Reading photo…" : "Add a photo";
+        var inputs = document.querySelectorAll(".photo-file-input");
+        for (var i = 0; i < inputs.length; i++) inputs[i].disabled = !!busy;
+      }
+
+      function openForm(plant) {
+        editingId = plant ? plant.id : null;
+        $("form-title").textContent = plant ? "Edit plant" : "Add a plant";
+        $("form-save").textContent = plant ? "Save changes" : "Add to my collection";
+        $("f-name").value = plant ? plant.name : "";
+        $("f-nickname").value = plant && plant.nickname ? plant.nickname : "";
+        $("f-acquired").value = plant && plant.acquired_date ? plant.acquired_date : "";
+        $("f-notes").value = plant && plant.notes ? plant.notes : "";
+        formPhoto = plant && plant.photo ? plant.photo : null;
+        formPhotoState = formPhoto ? "set" : "none";
+        $("photo-error").hidden = true;
+        $("save-error").hidden = true;
+        refreshPhotoUI(false);
+        updateSaveEnabled();
+        $("form").hidden = false;
+        $("form").scrollTop = 0;
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeForm() {
+        $("form").hidden = true;
+        editingId = null;
+        if ($("detail").hidden) document.body.style.overflow = "";
+        /* If we were editing from the detail view, refresh it underneath. */
+        if (selectedId && selectedPlant()) openDetail(selectedId);
+      }
+
+      function updateSaveEnabled() {
+        $("form-save").disabled = !$("f-name").value.trim();
+      }
+      $("f-name").addEventListener("input", updateSaveEnabled);
+      $("form-cancel").addEventListener("click", closeForm);
+      $("fab").addEventListener("click", function () { openForm(null); });
+      $("empty-add").addEventListener("click", function () { openForm(null); });
+
+      $("photo-remove").addEventListener("click", function () {
+        formPhoto = null;
+        formPhotoState = "removed";
+        refreshPhotoUI(false);
+      });
+      /* Camera and gallery are separate inputs, each tapped directly:
+         the camera one carries capture="environment" so it always opens
+         the camera, and the gallery one carries no capture so it always
+         opens the gallery. (A single shared input lets Android remember
+         the last source and offer only that one.) Clearing the value on
+         click — before the picker opens — means picking the same photo
+         twice still registers, and no stale selection can wedge the
+         input shut on the next tap. */
+      function handlePhotoInput(input) {
+        input.addEventListener("click", function () { input.value = ""; });
+        input.addEventListener("change", function () {
+          var file = input.files && input.files[0];
+          input.value = "";
+          if (!file) return;
+          $("photo-error").hidden = true;
+          refreshPhotoUI(true);
+          processImage(file).then(function (dataUrl) {
+            formPhoto = dataUrl;
+            formPhotoState = "set";
+            refreshPhotoUI(false);
+          }).catch(function () {
+            refreshPhotoUI(false);
+            var err = $("photo-error");
+            err.textContent = "That photo couldn't be read — try another one.";
+            err.hidden = false;
+          });
+        });
+      }
+      var photoInputs = document.querySelectorAll(".photo-file-input");
+      for (var pi = 0; pi < photoInputs.length; pi++) handlePhotoInput(photoInputs[pi]);
+
+      $("form-save").addEventListener("click", function () {
+        var name = $("f-name").value.trim();
+        if (!name) return;
+        var nickname = $("f-nickname").value.trim() || null;
+        var notes = $("f-notes").value.trim() || null;
+        var acquiredVal = $("f-acquired").value;
+        var acquired = validYmd(acquiredVal) ? acquiredVal : null;
+        var now = new Date().toISOString();
+        var next;
+
+        if (editingId) {
+          next = plants.map(function (p) {
+            if (p.id !== editingId) return p;
+            return {
+              id: p.id,
+              name: name,
+              nickname: nickname,
+              notes: notes,
+              acquired_date: acquired,
+              photo: formPhotoState === "set" ? formPhoto : (formPhotoState === "removed" ? null : p.photo),
+              created_at: p.created_at,
+              updated_at: now
+            };
+          });
+        } else {
+          var plant = {
+            id: newId(),
+            name: name,
+            nickname: nickname,
+            notes: notes,
+            acquired_date: acquired,
+            photo: formPhotoState === "set" ? formPhoto : null,
+            created_at: now,
+            updated_at: now
+          };
+          next = [plant].concat(plants);
+        }
+
+        if (!savePlants(next)) {
+          var err = $("save-error");
+          err.textContent = "Couldn't save — this browser is out of storage space. Export your collection, remove a plant or two, or use smaller photos, then try again.";
+          err.hidden = false;
+          return;
+        }
+        var wasEdit = !!editingId;
+        closeForm();
+        render();
+        showBanner(wasEdit ? "Saved." : "Filed away — " + name + " is on the shelf.");
+      });
+
+      /* ---------- search ---------- */
+      $("search").addEventListener("input", function (e) {
+        searchText = e.target.value;
+        render();
+      });
+
+      /* ---------- export ---------- */
+      function download(filename, text, type) {
+        var blob = new Blob([text], { type: type || "application/json" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+      }
+
+      $("export-btn").addEventListener("click", function () {
+        var payload = {
+          collection: "My Plant Collection",
+          portable: true,
+          version: 1,
+          exported_at: new Date().toISOString(),
+          count: plants.length,
+          plants: plants.map(function (p) {
+            return {
+              id: p.id,
+              label: p.name,
+              name: p.name,
+              nickname: p.nickname,
+              notes: p.notes,
+              acquired_date: p.acquired_date,
+              has_photo: !!p.photo,
+              photo: p.photo,
+              added_at: p.created_at
+            };
+          })
+        };
+        download("plant-collection-labels.json", JSON.stringify(payload, null, 2));
+        showBanner("Exported " + plants.length + (plants.length === 1 ? " labeled plant" : " labeled plants") + " — photos included. Keep that file somewhere safe.");
+      });
+
+      /* Save a standalone copy of this very app file. */
+      $("download-app-btn").addEventListener("click", function () {
+        var html = "<!doctype html>\n" + document.documentElement.outerHTML;
+        download("my-plant-collection.html", html, "text/html");
+        showBanner("Saved a copy of the app itself. Your plants stay in this browser — use Export for the copy that carries them.");
+      });
+
+      /* ---------- import ---------- */
+      var pendingImport = null; /* normalized plants from a chosen file */
+
+      function normalizePhoto(entry) {
+        var candidates = [entry.photo, entry.photo_data_url, entry.image_data_url, entry.image];
+        for (var i = 0; i < candidates.length; i++) {
+          if (typeof candidates[i] === "string" && candidates[i].indexOf("data:image/") === 0) return candidates[i];
+        }
+        if (typeof entry.image_base64 === "string" && entry.image_base64) {
+          return "data:" + (entry.image_mime || "image/jpeg") + ";base64," + entry.image_base64;
+        }
+        return null;
+      }
+
+      function normalizeImport(parsed) {
+        var arr = null;
+        if (Array.isArray(parsed)) arr = parsed;
+        else if (parsed && Array.isArray(parsed.plants)) arr = parsed.plants;
+        else if (parsed && Array.isArray(parsed.manifest)) arr = parsed.manifest;
+        else if (parsed && (parsed.label || parsed.name)) arr = [parsed];
+        if (!arr) return null;
+        var out = [];
+        var base = Date.now();
+        arr.forEach(function (entry, idx) {
+          if (!entry || typeof entry !== "object") return;
+          var name = (typeof entry.label === "string" && entry.label.trim()) ? entry.label.trim()
+            : (typeof entry.name === "string" && entry.name.trim()) ? entry.name.trim() : null;
+          if (!name) return;
+          var created = (typeof entry.added_at === "string" && entry.added_at) ? entry.added_at
+            : (typeof entry.created_at === "string" && entry.created_at) ? entry.created_at
+            : new Date(base - idx * 1000).toISOString();
+          out.push({
+            id: newId(),
+            name: name,
+            nickname: typeof entry.nickname === "string" && entry.nickname.trim() ? entry.nickname.trim() : null,
+            notes: typeof entry.notes === "string" && entry.notes.trim() ? entry.notes.trim() : null,
+            acquired_date: validYmd(entry.acquired_date) ? entry.acquired_date : null,
+            photo: normalizePhoto(entry),
+            created_at: created,
+            updated_at: created,
+            _hadPhotoFlag: entry.has_photo === true
+          });
+        });
+        return out;
+      }
+
+      /* Import inputs live inside their labels and are tapped directly,
+         same as the photo inputs — no forwarded clicks. */
+      function handleImportInput(input) {
+        input.addEventListener("click", function () { input.value = ""; });
+        input.addEventListener("change", function () {
+        var file = input.files && input.files[0];
+        input.value = "";
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          var parsed;
+          try {
+            parsed = JSON.parse(String(reader.result));
+          } catch (err) {
+            showBanner("That file isn't readable JSON — pick the file an Export created.", true);
+            return;
+          }
+          var normalized = normalizeImport(parsed);
+          if (!normalized || normalized.length === 0) {
+            showBanner("No plants found in that file — it doesn't look like a collection export.", true);
+            return;
+          }
+          pendingImport = normalized;
+          var withPhotos = normalized.filter(function (p) { return !!p.photo; }).length;
+          var flaggedNoData = normalized.filter(function (p) { return !p.photo && p._hadPhotoFlag; }).length;
+          var msg = "Found " + normalized.length + (normalized.length === 1 ? " plant" : " plants") + " in that file";
+          msg += withPhotos > 0 ? ", " + withPhotos + (withPhotos === 1 ? " with its photo" : " with their photos") : ", labels and notes only";
+          msg += ".";
+          if (flaggedNoData > 0) msg += " " + flaggedNoData + (flaggedNoData === 1 ? " entry says it had a photo, but that file didn't include photo data, so it will come in without one." : " entries say they had photos, but that file didn't include photo data, so they will come in without them.");
+          msg += plants.length > 0
+            ? " Add them alongside the " + plants.length + " already here, or replace your collection with this file?"
+            : " Bring them in?";
+          $("import-confirm-text").textContent = msg;
+          $("import-replace").hidden = plants.length === 0;
+          $("import-add").textContent = plants.length === 0 ? "Bring them in" : "Add to my collection";
+          $("import-confirm").hidden = false;
+          $("import-confirm").scrollIntoView({ block: "nearest" });
+        };
+        reader.onerror = function () {
+          showBanner("Couldn't read that file — try again.", true);
+        };
+        reader.readAsText(file);
+        });
+      }
+      var importInputs = document.querySelectorAll(".import-file-input");
+      for (var ii = 0; ii < importInputs.length; ii++) handleImportInput(importInputs[ii]);
+
+      function finishImport(mode) {
+        if (!pendingImport) return;
+        var incoming = pendingImport.map(function (p) {
+          var copy = {};
+          for (var k in p) if (k !== "_hadPhotoFlag") copy[k] = p[k];
+          return copy;
+        });
+        var next;
+        var addedCount = incoming.length;
+        if (mode === "replace") {
+          next = incoming;
+        } else {
+          var seen = {};
+          plants.forEach(function (p) {
+            seen[(p.name.trim().toLowerCase() + "|" + p.created_at + "|" + (p.nickname || "")).toLowerCase()] = true;
+          });
+          var fresh = incoming.filter(function (p) {
+            var key = (p.name.trim().toLowerCase() + "|" + p.created_at + "|" + (p.nickname || "")).toLowerCase();
+            if (seen[key]) { addedCount--; return false; }
+            seen[key] = true;
+            return true;
+          });
+          next = fresh.concat(plants);
+        }
+        if (!savePlants(next)) {
+          showBanner("Import didn't fit — this browser is out of storage space. Export what's here first, or import a smaller file.", true, true);
+          return;
+        }
+        pendingImport = null;
+        $("import-confirm").hidden = true;
+        render();
+        showBanner(mode === "replace"
+          ? "Collection restored — " + next.length + (next.length === 1 ? " plant" : " plants") + " on the shelf."
+          : "Imported " + addedCount + (addedCount === 1 ? " plant" : " plants") + ".");
+      }
+
+      $("import-add").addEventListener("click", function () { finishImport("add"); });
+      $("import-replace").addEventListener("click", function () { finishImport("replace"); });
+      $("import-cancel").addEventListener("click", function () {
+        pendingImport = null;
+        $("import-confirm").hidden = true;
+      });
+
+      /* ---------- keyboard: Esc closes overlays ---------- */
+      document.addEventListener("keydown", function (e) {
+        if (e.key !== "Escape") return;
+        if (!$("form").hidden) closeForm();
+        else if (!$("detail").hidden) closeDetail();
+      });
+
+      /* ---------- boot ---------- */
+      plants = loadPlants();
+      render();
+      if (storageBroken) {
+        showBanner("This browser wouldn't open its storage, so the collection can't load or save here. Try a regular (non-private) window.", true, true);
+      }
+    </script>
+  </body>
+</html>
